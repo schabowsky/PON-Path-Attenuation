@@ -28,9 +28,13 @@ class CalculationPanel extends Component {
             this.state[`b_${f}`] * (this.state[`b_0_${f}`] ** 2)));
 
         const m_w_sum = 0, m_0_sum = 0;
+        const attenuation = (m * s_w) + (k * c_w) + (l * f_w) + b_w_sum + m_w_sum;
+        const attenuation_sd = 3 * Math.sqrt((m * s_0 * s_0) + (k * c_0 * c_0) + (l * f_0 * f_0) + b_0_sum + m_0_sum);
         this.setState({
-            attenuation: ((m * s_w) + (k * c_w) + (l * f_w) + b_w_sum + m_w_sum).toFixed(2),
-            attenuation_sd: (3 * Math.sqrt((m * s_0 * s_0) + (k * c_0 * c_0) + (l * f_0 * f_0) + b_0_sum + m_0_sum)).toFixed(2)
+            attenuation: Math.round((attenuation + Number.EPSILON) * 100) / 100,
+            attenuation_sd: Math.round((attenuation_sd + Number.EPSILON) * 100) / 100,
+            maxAttenuation: Math.round((attenuation + attenuation_sd + Number.EPSILON) * 100) / 100,
+            minAttenuation: Math.round((attenuation - attenuation_sd + Number.EPSILON) * 100) / 100
         })
     };
 
@@ -39,9 +43,18 @@ class CalculationPanel extends Component {
             <div className="container">
                 <span className={"title-col"}>Tłumienność toru optycznego w sieci PON</span>
                 <div style={{marginBottom: 20}}>
-                    <input readOnly
-                           value={`${this.state.attenuation} ± ${this.state.attenuation_sd}`}/>
-                    <span>dB</span>
+                    <div style={{display: "inline-block"}}>
+                        <span>min</span>
+                        <input readOnly style={{margin: 5}}
+                               value={this.state.minAttenuation}/>
+                        <span>dB</span>
+                    </div>
+                    <div style={{display: 'inline-block', marginLeft: 50}}>
+                        <span>max</span>
+                        <input readOnly style={{margin: 5}}
+                               value={this.state.maxAttenuation}/>
+                        <span>dB</span>
+                    </div>
                 </div>
                 <div className="form">
                     <div style={{marginRight: 20}}>
